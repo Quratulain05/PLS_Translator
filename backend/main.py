@@ -2,11 +2,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import numpy as np
+import os  # Ensure this is imported
 
 app = FastAPI()
 
 # Load your ML model
-model = joblib.load("path/to/your_model.pkl")  # Update with the correct path
+model_path = os.path.join(os.path.dirname(__file__), "models", "label_encoder.pkl")
+model = joblib.load(model_path)  # Load the model using joblib
 
 # Define the request and response schemas
 class PredictionRequest(BaseModel):
