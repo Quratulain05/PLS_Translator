@@ -1,5 +1,5 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -24,6 +24,11 @@ export const HomePage = () => {
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [recordedChunks, setRecordedChunks] = useState([]);
+  const videoRef = useRef(null);
+  const [stream, setStream] = useState(null);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -37,7 +42,45 @@ export const HomePage = () => {
     if (file) {
       setSelectedFile(file);
       console.log("Selected video file:", file.name);
-      // Add file upload logic here if needed
+    }
+  };
+
+  const handleRecordToggle = async () => {
+    if (!isRecording) {
+      // Start recording
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setStream(newStream);
+        videoRef.current.srcObject = newStream;
+
+        const newMediaRecorder = new MediaRecorder(newStream);
+        setMediaRecorder(newMediaRecorder);
+        setRecordedChunks([]);
+
+        newMediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            setRecordedChunks((prev) => [...prev, event.data]);
+          }
+        };
+
+        newMediaRecorder.start();
+        setIsRecording(true);
+      } catch (error) {
+        console.error("Error accessing webcam:", error);
+        alert("Please enable camera permissions to record video.");
+      }
+    } else {
+      // Stop recording
+      mediaRecorder.stop();
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: "video/mp4" });
+        const url = URL.createObjectURL(blob);
+        videoRef.current.srcObject = null;
+        videoRef.current.src = url;
+        videoRef.current.controls = true;
+      };
+      stream.getTracks().forEach((track) => track.stop()); // Stop the webcam stream
+      setIsRecording(false);
     }
   };
 
@@ -45,7 +88,7 @@ export const HomePage = () => {
     <div className="flex flex-row px-20 items-center mainbgImg min-h-full">
       <div className="bg-white h-3/4 z-0" style={{ flex: 6 }}>
         <div className="flex flex-row mt-80 pt-10">
-          {/* Updated Browse Button with file input */}
+          {/* Browse Button with file input */}
           <input
             accept="video/*"
             type="file"
@@ -54,39 +97,29 @@ export const HomePage = () => {
             onChange={handleFileSelect}
           />
           <label htmlFor="browse-video-input">
-            <Button
-              component="span"
-              className="button w-60 mx-3 flex"
-              sx={{ background: "white" }}
-            >
-              <Typography
-                className="text-black flex justify-end z-10"
-                style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}
-              >
+            <Button component="span" className="button w-60 mx-3 flex" sx={{ background: "white" }}>
+              <Typography className="text-black flex justify-end z-10" style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}>
                 Browse
               </Typography>
             </Button>
           </label>
 
           {/* Record Button */}
-          <Button className="button w-60 mx-3 flex" sx={{ background: "white" }}>
-            <Typography
-              className="text-black flex justify-end z-10"
-              style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}
-            >
-              Record
+          <Button onClick={handleRecordToggle} className="button w-60 mx-3 flex" sx={{ background: "white" }}>
+            <Typography className="text-black flex justify-end z-10" style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}>
+              {isRecording ? "Stop" : "Record"}
             </Typography>
           </Button>
         </div>
+
+        {/* Video Preview */}
+        <video ref={videoRef} className="mt-5 w-full" autoPlay muted />
       </div>
 
       {/* Submit Button */}
       <div className="flex ml-10 justify-center flex-col" style={{ flex: 4 }}>
         <Button onClick={handleOpen} className="button w-60 flex justify-center" sx={{ background: "white" }}>
-          <Typography
-            className="text-black"
-            style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}
-          >
+          <Typography className="text-black" style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}>
             Submit
           </Typography>
         </Button>
