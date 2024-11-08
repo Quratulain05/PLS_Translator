@@ -20,6 +20,7 @@ const style = {
 };
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
+
 export const HomePage = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -31,8 +32,40 @@ export const HomePage = () => {
   };
   return (
     <div className="flex flex-row px-20 items-center mainbgImg min-h-full">
-      <div className="bg-white h-3/4  " style={{ flex: 6 }}></div>
-      <div className=" flex  justify-center" style={{ flex: 4 }}>
+      <div className="bg-white h-3/4 z-0  " style={{ flex: 6 }}>
+      <div className="flex flex-row mt-80  pt-10 ">
+
+      <Button
+        
+          className="button w-60 mx-3 flex  "
+          sx={{ background: "white" }}
+        >
+          <Typography
+            className="text-black flex justify-end z-10"
+            style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}
+          >
+            {" "}
+            Browse{" "}
+          </Typography>
+        </Button>
+        
+      <Button
+        
+          className="button w-60  mx-3 flex  "
+          sx={{ background: "white" }}
+        >
+          <Typography
+            className="text-black flex justify-end z-10"
+            style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}
+          >
+            {" "}
+            Record{" "}
+          </Typography>
+        </Button>
+      </div>
+      </div>
+      <div className=" flex ml-10  justify-center flex-col" style={{ flex: 4 }}>
+       
         <Button
           onClick={handleOpen}
           className="button w-60 flex justify-center"
@@ -43,13 +76,14 @@ export const HomePage = () => {
             style={{ fontWeight: "bolder", fontFamily: "Montserrat" }}
           >
             {" "}
-            Capture{" "}
+            submit
+            {" "}
           </Typography>
         </Button>
       </div>
       <img
         src={doct}
-        className="bg-white bounce-animation  rounded-full "
+        className="bg-white  bounce-animation  rounded-full "
         style={{ flex: 4, height: "350px" }}
       />
       <Modal open={open} onClose={handleClose}>
