@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
-import Checkbox from '@mui/material/Checkbox';
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -18,70 +18,100 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 export const SignupScreen = () => {
   const [open, setOpen] = React.useState(true); // Modal should open by default
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [error, setError] = React.useState('');
 
   const handleClose = () => setOpen(false);
 
-  React.useEffect(() => {
-    setOpen(true); // Open modal when component mounts
-  }, []);
+  const handleSignup = () => {
+    // Basic validation
+    if (!name || !email || !password || !confirmPassword) {
+      setError("Please fill all fields");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    // Clear error if inputs are valid
+    setError("");
+    
+    // Here, add your authentication logic, e.g., API call
+
+    console.log("User data:", { name, email, password });
+  };
 
   return (
-    <div className="bgImg z-0 w-auto  ">
-    <Modal open={open} onClose={handleClose}>
-      <Box sx={style} className="rounded-3xl">
-        <div>
-          <Typography
-            className="text-center"
-            style={{
-              color: "#4D115C",
-              fontFamily: "Montserrat",
-              fontSize: 40,
-              fontWeight: "bolder",
-            }}
-          >
-            Sign Up
-          </Typography>
-          <div className="flex flex-col items-center">
-            <TextField
-              className="mt-16 w-80"
-              id="standard-basic"
-              placeholder="Enter Name"
-              variant="standard"
-            />
-            <TextField
-              className="mt-8 w-80"
-              id="standard-basic"
-              placeholder="Enter Email"
-              variant="standard"
-            />
-            <TextField
-              className="mt-8 w-80"
-              id="standard-basic"
-              placeholder="Enter Password"
-              variant="standard"
-            />
-            <TextField
-              className="mt-8 w-80"
-              id="standard-basic"
-              placeholder="Confirm Password"
-              variant="standard"
-            />
-          </div>
-          <div className="flex justify-center">
-            <Button
-              className="w-80 text-white mt-20"
-              style={{ background: "#4D115C" }}
+    <div className="bgImg z-0 w-auto">
+      <Modal open={open} onClose={handleClose}>
+        <Box sx={style} className="rounded-3xl">
+          <div>
+            <Typography
+              className="text-center"
+              style={{
+                color: "#4D115C",
+                fontFamily: "Montserrat",
+                fontSize: 40,
+                fontWeight: "bolder",
+              }}
             >
-              Create Account
-            </Button>
+              Sign Up
+            </Typography>
+            <div className="flex flex-col items-center">
+              <TextField
+                className="mt-16 w-80"
+                placeholder="Enter Name"
+                variant="standard"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <TextField
+                className="mt-8 w-80"
+                placeholder="Enter Email"
+                variant="standard"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField
+                className="mt-8 w-80"
+                placeholder="Enter Password"
+                variant="standard"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <TextField
+                className="mt-8 w-80"
+                placeholder="Confirm Password"
+                variant="standard"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {error && (
+                <Typography color="error" className="mt-4">
+                  {error}
+                </Typography>
+              )}
+            </div>
+            <div className="flex justify-center">
+              <Button
+                className="w-80 text-white mt-20"
+                style={{ background: "#4D115C" }}
+                onClick={handleSignup}
+              >
+                Create Account
+              </Button>
+            </div>
           </div>
-        </div>
-      </Box>
-    </Modal>
+        </Box>
+      </Modal>
     </div>
   );
 };
